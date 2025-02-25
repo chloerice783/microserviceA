@@ -110,4 +110,5 @@ app.post('/fetch-objects', async (req, res) => {
     }
 });
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+![MSA drawio](https://github.com/user-attachments/assets/d1275ed7-7939-4da3-b759-e87973105048)
 
