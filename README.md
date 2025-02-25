@@ -44,3 +44,70 @@ the post request into objectsList, will write the entirety of objectsList back i
 file will later be sent as a response back to the post request (I ran out of time to implement this part but 
 will add it soon.) 
 
+#Note that fs and path must be installed in order to use the rest API microservice like this. I believe
+CORS may also be necessary to allow the communication between ports. 
+
+-in your terminal, type: npm install cors fs path
+-Then in your server file, include: 
+// Import dependencies
+
+const cors = require("cors");
+const app = express();
+const path = require('path');
+const fs = require('fs')
+
+app.use(cors()); // Allow all origins (for now)
+
+//Path to the JSON file
+const FILE_PATH = path.join(__dirname, 'hierarchy_objects.json');
+
+-assuming you are using express 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+const FILE_PATH = path.join(__dirname, 'hierarchy_objects.json');
+
+//Function to read JSON file
+function readJsonFile() {
+    try {
+        if (!fs.existsSync(FILE_PATH)) {
+            fs.writeFileSync(FILE_PATH, JSON.stringify([])); // Create file if it doesn't exist
+        }
+        const data = fs.readFileSync(FILE_PATH);
+        return JSON.parse(data);
+    } catch (error) {
+        console.error("Error reading JSON file:", error);
+        return [];
+    }
+}
+
+//Function to write to JSON file
+function writeJsonFile(data) {
+    try {
+        fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 4)); 
+    } catch (error) {
+        console.error("Error writing JSON file:", error);
+    }
+}
+
+//API to update the object list
+app.post('/fetch-objects', async (req, res) => {
+    const { object } = req.body;
+    
+    if (!object) {
+        return res.status(400).json({ error: "Missing object in request body." });
+    }
+
+    console.log(`Fetching object: ${object}`);
+
+    let objectsList = readJsonFile();
+
+    //Check if the object already exists
+    if (!objectsList.includes(object)) {
+        objectsList.push(object);
+        writeJsonFile(objectsList);
+        return res.json({ message: "Object added.", updatedList: objectsList });
+    } else {
+        return res.json({ message: "Object already exists.", updatedList: objectsList });
+    }
+});
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
